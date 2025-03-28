@@ -54,8 +54,6 @@ const UserProfile = () => {
           }),
         ]);
 
-        console.log(userRes);
-
         setUser(userRes.data.user);
         setAppointments(appointmentsRes.data.appointments);
 

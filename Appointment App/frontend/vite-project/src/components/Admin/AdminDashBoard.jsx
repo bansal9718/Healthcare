@@ -159,7 +159,6 @@ const AdminDashboard = () => {
       );
 
       toast.success(`Status updated to ${newStatus}`);
-      console.log(res.data);
     } catch (error) {
       // Revert UI on failure
       setRecentAppointments((prevAppointments) =>

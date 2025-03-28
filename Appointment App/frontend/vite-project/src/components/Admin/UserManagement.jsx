@@ -31,7 +31,6 @@ const UserManagement = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        console.log(appointmentRes);
         const appointmentsData = {};
 
         appointmentRes.data.appointments.forEach((appointment) => {

@@ -129,7 +129,6 @@ const UserDashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log(res);
       setAppointments(res.data.appointments);
       setRecentAppointments(res.data.appointments);
     } catch (error) {

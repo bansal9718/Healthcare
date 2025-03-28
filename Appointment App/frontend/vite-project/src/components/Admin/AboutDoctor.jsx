@@ -16,12 +16,14 @@ import { Link } from "react-router";
 
 const AboutDoctor = () => {
   return (
-    
     <div
       className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')",
+          "linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5)), url('/doctor.webp')",
+        backgroundSize: "cover", // Ensures the image covers the entire div
+        backgroundPosition: "center", // Centers the image
+        backgroundRepeat: "no-repeat", // Prevents image repetition
         backgroundColor: "#176fc7",
       }}
     >
