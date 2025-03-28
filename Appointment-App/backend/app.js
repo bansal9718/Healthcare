@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://advancedcardiaccare.netlify.app/",
+    origin: "https://advancedcardiaccare.netlify.app",
     credentials: true,
   })
 );
