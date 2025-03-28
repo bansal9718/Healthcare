@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
+
 import axios from "axios";
 import {
   User,
@@ -11,6 +12,7 @@ import {
   AlertCircle,
   ChevronRight,
 } from "lucide-react";
+import API from "../../../api";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -40,7 +42,7 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      await axios.post("http://localhost:8000/api/auth/register", formData);
+      await API.post("/api/auth/register", formData);
       navigate("/login", { state: { registrationSuccess: true } });
     } catch (err) {
       setError(

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import API from "../../../api";
 import { Calendar, Clock, User, Phone } from "lucide-react";
 
 const TodayAppointments = () => {
@@ -18,8 +19,8 @@ const TodayAppointments = () => {
         }
 
         const today = new Date().toISOString().split("T")[0];
-        const res = await axios.get(
-          `http://localhost:8000/api/appointment/getAppointmentsByDate/${today}`,
+        const res = await API.get(
+          `/api/appointment/getAppointmentsByDate/${today}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

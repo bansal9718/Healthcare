@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router";
+import API from "../../../api";
 import {
   ClipboardList,
   Clock,
@@ -45,10 +46,10 @@ const UserProfile = () => {
         const decoded = jwtDecode(token);
 
         const [userRes, appointmentsRes] = await Promise.all([
-          axios.get(`http://localhost:8000/api/user/get/${decoded.id}`, {
+          API.get(`/api/user/get/${decoded.id}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:8000/api/appointment/myAppointments", {
+          API.get("/api/appointment/myAppointments", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -98,8 +99,8 @@ const UserProfile = () => {
       const formData = new FormData();
       formData.append("profileImage", profileImage);
 
-      const response = await axios.post(
-        `http://localhost:8000/api/user/upload-profile-image`,
+      const response = await API.post(
+        `/api/user/upload-profile-image`,
         formData,
         {
           headers: {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import API from "../../../api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
@@ -22,12 +23,9 @@ const EditProfileUser = () => {
       try {
         const token = localStorage.getItem("token");
         const decoded = jwtDecode(token);
-        const res = await axios.get(
-          `http://localhost:8000/api/user/get/${decoded.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await API.get(`/api/user/get/${decoded.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setUser({
           name: res.data.user.username,
           email: res.data.user.email,
@@ -49,8 +47,8 @@ const EditProfileUser = () => {
     try {
       const token = localStorage.getItem("token");
       const decoded = jwtDecode(token);
-      await axios.put(
-        `http://localhost:8000/api/user/update/${decoded.id}`,
+      await API.put(
+        `/api/user/update/${decoded.id}`,
         {
           name: user.name,
           email: user.email,

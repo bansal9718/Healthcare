@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API from "../../../api";
 import { useNavigate, Link } from "react-router";
 
 const UserManagement = () => {
@@ -16,19 +17,16 @@ const UserManagement = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const userRes = await axios.get(
-          "http://localhost:8000/api/user/getAll",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const userRes = await API.get("/api/user/getAll", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         let usersData = userRes.data.users.filter((user) => !user.isAdmin);
 
         setUsers(usersData);
         setFilteredUsers(usersData);
 
-        const appointmentRes = await axios.get(
-          "http://localhost:8000/api/appointment/allAppointments",
+        const appointmentRes = await API.get(
+          "/api/appointment/allAppointments",
           {
             headers: { Authorization: `Bearer ${token}` },
           }

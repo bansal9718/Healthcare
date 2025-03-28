@@ -17,9 +17,8 @@ import {
 } from "react-icons/fa";
 
 const HomePage = () => {
-
   const navigate = useNavigate();
-  
+
   const googleMapsAddress =
     "https://www.google.com/maps/place/HeartCare+Speciality+Clinic,+123+Medical+Tower,+Health+District,+Gwalior,+India+474001";
 

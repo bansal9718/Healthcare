@@ -1,4 +1,5 @@
 import axios from "axios";
+import API from "../../../api";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from "react-toastify";
@@ -24,10 +25,9 @@ const BookSlots = () => {
   const fetchSlots = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(
-        `http://localhost:8000/api/appointment/getSlots/${selectedDate}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await API.get(`/api/appointment/getSlots/${selectedDate}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setSlots(res.data.slots);
     } catch (error) {
       setSlots([]);
@@ -45,10 +45,9 @@ const BookSlots = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.get(
-        `http://localhost:8000/api/appointment/bookSlot/${slot._id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await API.get(`/api/appointment/bookSlot/${slot._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Appointment booked successfully!");
       setTimeout(() => {
         navigate("/userDashboard");
@@ -77,10 +76,9 @@ const BookSlots = () => {
         }
 
         const decoded = jwtDecode(token);
-        const res = await axios.get(
-          `http://localhost:8000/api/appointment/myAppointments`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await API.get(`/api/appointment/myAppointments`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const pending = res.data.appointments.filter(
           (appt) => appt.status === "Pending"

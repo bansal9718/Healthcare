@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
+import API from "../../../api";
+
 import {
   Home,
   Calendar,
@@ -77,10 +79,10 @@ const AdminDashboard = () => {
       }
 
       const [appointmentsRes, usersRes] = await Promise.all([
-        axios.get("http://localhost:8000/api/appointment/allAppointments", {
+        API.get("/api/appointment/allAppointments", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("http://localhost:8000/api/user/getAll", {
+        API.get("/api/user/getAll", {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -104,8 +106,8 @@ const AdminDashboard = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const res = await axios.get(
-        `http://localhost:8000/api/appointment/getAppointmentsByDate/${
+      const res = await API.get(
+        `/api/appointment/getAppointmentsByDate/${
           new Date().toISOString().split("T")[0]
         }`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -150,8 +152,8 @@ const AdminDashboard = () => {
       );
 
       // API request
-      const res = await axios.put(
-        "http://localhost:8000/api/appointment/updateStatus",
+      const res = await API.put(
+        "/api/appointment/updateStatus",
         { appointmentId: id, status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

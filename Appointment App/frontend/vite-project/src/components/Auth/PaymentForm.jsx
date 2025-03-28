@@ -11,6 +11,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { jwtDecode } from "jwt-decode";
+import API from "../../../api";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -23,10 +24,9 @@ const CheckoutForm = ({ amount, onSuccess, slotId }) => {
   const handleBookSlot = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.get(
-        `http://localhost:8000/api/appointment/bookSlot/${slotId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await API.get(`/api/appointment/bookSlot/${slotId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Appointment booked successfully!");
       setTimeout(() => {
         navigate("/user/dashboard");

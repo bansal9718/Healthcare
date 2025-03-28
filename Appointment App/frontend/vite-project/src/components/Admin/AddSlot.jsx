@@ -1,18 +1,19 @@
 import React, { useState } from "react";
+import API from "../../../api";
+
 import axios from "axios";
 import { motion } from "framer-motion";
 import { MdClose } from "react-icons/md";
 import { useNavigate } from "react-router";
 
 const AddSlot = ({ onClose, onSlotAdded }) => {
-
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -29,8 +30,8 @@ const AddSlot = ({ onClose, onSlotAdded }) => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.post(
-        "http://localhost:8000/api/appointment/generateSlot",
+      const res = await API.post(
+        "/api/appointment/generateSlot",
         { date, startTime, endTime },
         { headers: { Authorization: `Bearer ${token}` } }
       );

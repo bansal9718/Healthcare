@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import API from "../../../api";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { MdPerson, MdSchedule, MdPhone } from "react-icons/md";
@@ -17,8 +18,8 @@ const Appointments = () => {
           return;
         }
 
-        const res = await axios.get(
-          "http://localhost:8000/api/appointment/allAppointments",
+        const res = await API.get(
+          "/api/appointment/allAppointments",
           {
             headers: { Authorization: `Bearer ${token}` },
           }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API from "../../../api";
 import { useNavigate, useParams } from "react-router";
 import { User, Calendar, Clock, Clipboard } from "lucide-react";
 
@@ -14,8 +15,8 @@ const DoctorUserView = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(
-          `http://localhost:8000/api/user/get/${id}`,
+        const res = await API.get(
+          `/api/user/get/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -47,8 +48,8 @@ const DoctorUserView = () => {
           return;
         }
 
-        const res = await axios.get(
-          `http://localhost:8000/api/appointment/user/${id}`,
+        const res = await API.get(
+          `/api/appointment/user/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 

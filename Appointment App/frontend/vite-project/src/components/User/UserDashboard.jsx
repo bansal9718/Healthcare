@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import API from "../../../api";
 import {
   User,
   Calendar,
@@ -80,8 +81,8 @@ const UserDashboard = () => {
       }
 
       const decodedToken = jwtDecode(token);
-      const res = await axios.get(
-        `http://localhost:8000/api/user/get/${decodedToken?.id}`,
+      const res = await API.get(
+        `/api/user/get/${decodedToken?.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setUserData(res.data.user);
@@ -123,8 +124,8 @@ const UserDashboard = () => {
         return;
       }
 
-      const res = await axios.get(
-        `http://localhost:8000/api/appointment/myAppointments`,
+      const res = await API.get(
+        `/api/appointment/myAppointments`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

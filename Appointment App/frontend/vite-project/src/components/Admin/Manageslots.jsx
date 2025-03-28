@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import API from "../../../api";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { MdAdd, MdDelete } from "react-icons/md";
@@ -22,12 +23,9 @@ const ManageSlots = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(
-        `http://localhost:8000/api/appointment/getSlots/${selectedDate}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await API.get(`/api/appointment/getSlots/${selectedDate}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setSlots(res.data.slots);
     } catch (err) {
       setError(err.response?.data?.message || "Error fetching slots");

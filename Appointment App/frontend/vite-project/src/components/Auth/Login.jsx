@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import axios from "axios";
 import { HeartPulse, Lock, Mail, UserPlus, AlertCircle } from "lucide-react";
+import API from "../../../api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,8 +23,8 @@ const Login = () => {
     setError("");
 
     try {
-      const res = await axios.post(
-        "http://localhost:8000/api/auth/login",
+      const res = await API.post(
+        "/api/auth/login",
         formData
       );
       localStorage.setItem("token", res.data.token);
