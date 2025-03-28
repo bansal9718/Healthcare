@@ -12,12 +12,23 @@ const paymentRoutes = require("./Routes/PaymentRoutes");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const allowedOrigins = ["https://advancedcardiaccare.netlify.app"]; // No trailing slash
+
 app.use(
   cors({
-    origin: "https://advancedcardiaccare.netlify.app",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
+
 // Mounting the routes
 app.use("/api/user", UserRoutes);
 app.use("/api/auth", AuthenticationRoutes);
