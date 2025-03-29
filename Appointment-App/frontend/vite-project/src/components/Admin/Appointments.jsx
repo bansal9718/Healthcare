@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import API from "../../../api";
-import axios from "axios";
 import { motion } from "framer-motion";
 import { MdPerson, MdSchedule, MdPhone } from "react-icons/md";
 
@@ -18,12 +17,9 @@ const Appointments = () => {
           return;
         }
 
-        const res = await API.get(
-          "/api/appointment/allAppointments",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await API.get("/api/appointment/allAppointments", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         setAppointments(res.data.appointments);
       } catch (err) {
@@ -41,7 +37,7 @@ const Appointments = () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-gray-100 p-5"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto mt-30">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-semibold text-gray-900">Appointments</h2>
         </div>
@@ -97,7 +93,8 @@ const Appointments = () => {
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
+                      {appt.status.charAt(0).toUpperCase() +
+                        appt.status.slice(1)}
                     </span>
                   </div>
                 </motion.div>

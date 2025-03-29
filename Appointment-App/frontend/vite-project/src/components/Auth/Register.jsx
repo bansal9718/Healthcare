@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router";
-
 import axios from "axios";
 import {
   User,
@@ -16,6 +15,7 @@ import API from "../../../api";
 
 const Register = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: "",
     age: "",
@@ -32,7 +32,7 @@ const Register = () => {
   };
 
   const handlePhoneChange = (e) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 10); // Strictly 10 digits
+    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
     setFormData({ ...formData, phoneNumber: value });
   };
 
@@ -62,27 +62,29 @@ const Register = () => {
           "linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.5)), url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')",
       }}
     >
-      <div className="bg-white px-10 py-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
-        <div className="flex justify-center mb-6">
-          <div className="bg-blue-50 p-3 rounded-full">
+      <div className="bg-white px-6 py-8 rounded-xl shadow-lg w-full max-w-md border border-gray-100">
+        {/* Header */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="bg-blue-50 p-3 rounded-full mb-3">
             <HeartPulse className="text-blue-600 w-8 h-8" />
           </div>
+          <h2 className="text-2xl font-bold text-center text-gray-800">
+            HeartCare Portal
+          </h2>
+          <p className="text-gray-600 text-center mt-1 text-sm">
+            Patient Registration
+          </p>
         </div>
 
-        <h2 className="text-2xl font-bold text-center text-gray-800">
-          HeartCare Portal
-        </h2>
-        <p className="text-gray-600 text-center mt-2 text-sm">
-          Patient Registration
-        </p>
-
+        {/* Error Message */}
         {error && (
           <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg flex items-center">
-            <AlertCircle className="mr-2" size={16} />
-            {error}
+            <AlertCircle className="mr-2 flex-shrink-0" size={16} />
+            <span>{error}</span>
           </div>
         )}
 
+        {/* Registration Form */}
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           {[
             {
@@ -145,7 +147,7 @@ const Register = () => {
                   </div>
                   <select
                     name={field.name}
-                    className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+                    className="w-full pl-10 pr-3 py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
                     value={formData[field.name]}
                     onChange={handleChange}
                     required={field.required}
@@ -169,7 +171,7 @@ const Register = () => {
                   <input
                     type={field.type}
                     name={field.name}
-                    className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-3 py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder={field.placeholder}
                     value={formData[field.name]}
                     onChange={
@@ -190,7 +192,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center"
+            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center text-sm md:text-base"
           >
             {isLoading ? (
               <>
@@ -222,9 +224,10 @@ const Register = () => {
           </button>
         </form>
 
+        {/* Footer Links */}
         <div className="mt-6 pt-4 border-t border-gray-100">
-          <div className="flex flex-col space-y-3">
-            <div className="text-center text-xs text-gray-500">
+          <div className="flex flex-col space-y-3 text-center">
+            <p className="text-xs text-gray-500">
               By registering, you agree to our{" "}
               <a href="#" className="text-blue-600 hover:underline">
                 Terms
@@ -233,13 +236,13 @@ const Register = () => {
               <a href="#" className="text-blue-600 hover:underline">
                 Privacy Policy
               </a>
-            </div>
+            </p>
 
             <Link
               to="/login"
-              className="w-full flex items-center justify-center text-blue-600 hover:text-blue-800 transition"
+              className="flex items-center justify-center text-blue-600 hover:text-blue-800 transition text-sm"
             >
-              <span className="text-sm font-medium">
+              <span className="font-medium">
                 Already have an account? Sign in
               </span>
               <ChevronRight className="ml-1" size={16} />

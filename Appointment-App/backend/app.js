@@ -1,11 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const UserRoutes = require("./Routes/UserRoutes");
-const AuthenticationRoutes = require("./Routes/AutheticationRoutes"); // Fixed Typo
+const AuthenticationRoutes = require("./Routes/AutheticationRoutes"); 
 const AppointmentRoutes = require("./Routes/AppointmentRoutes");
 const AdminRoutes = require("./Routes/AdminRoutes");
 const paymentRoutes = require("./Routes/PaymentRoutes");
@@ -13,7 +15,7 @@ const paymentRoutes = require("./Routes/PaymentRoutes");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = ["https://advancedcardiaccare.netlify.app"]; // No trailing slash
+const allowedOrigins = ["https://advancedcardiaccare.netlify.app"]; 
 
 app.use(
   cors({
@@ -27,7 +29,6 @@ app.use(
     credentials: true,
   })
 );
-
 
 // Mounting the routes
 app.use("/api/user", UserRoutes);

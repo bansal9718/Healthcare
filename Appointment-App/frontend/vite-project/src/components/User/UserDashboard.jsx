@@ -18,7 +18,7 @@ import {
   CheckCircle,
   Home,
 } from "lucide-react";
-import axios from "axios";
+
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Skeleton from "react-loading-skeleton";
@@ -35,9 +35,11 @@ const UserDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
-  const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Toggle sidebar for desktop
+  const navigate = useNavigate();
+  const API_BASE_URL = "https://healthcare-9uj8.onrender.com";
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -45,6 +47,7 @@ const UserDashboard = () => {
   // Toggle sidebar for mobile
   const toggleMobileSidebar = () => {
     setMobileSidebarOpen(!mobileSidebarOpen);
+    setSidebarOpen(!sidebarOpen);
   };
 
   // Close mobile sidebar when clicking outside
@@ -72,27 +75,29 @@ const UserDashboard = () => {
     });
   };
 
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
 
-      const decodedToken = jwtDecode(token);
-      const res = await API.get(
-        `/api/user/get/${decodedToken?.id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setUserData(res.data.user);
-    } catch (err) {
-      toast.error("Error fetching user data.");
-    } finally {
-      setLoading(false);
-    }
-  };
-  // Add this useEffect hook near your other hooks
+        const decodedToken = jwtDecode(token);
+        const res = await API.get(`/api/user/get/${decodedToken?.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserData(res.data.user);
+      } catch (err) {
+        toast.error("Error fetching user data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isUserDropdownOpen) {
@@ -116,25 +121,27 @@ const UserDashboard = () => {
     };
   }, [isUserDropdownOpen]);
 
-  const fetchAppointments = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const res = await API.get(`/api/appointment/myAppointments`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setAppointments(res.data.appointments);
+        setRecentAppointments(res.data.appointments);
+      } catch (error) {
+        toast.error("Error fetching appointments.");
       }
-
-      const res = await API.get(
-        `/api/appointment/myAppointments`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setAppointments(res.data.appointments);
-      setRecentAppointments(res.data.appointments);
-    } catch (error) {
-      toast.error("Error fetching appointments.");
-    }
-  };
+    };
+    fetchAppointments();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -145,47 +152,67 @@ const UserDashboard = () => {
   };
 
   useEffect(() => {
-    fetchUserData();
-    fetchAppointments();
-
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
+      const isMobileView = window.innerWidth < 768;
+      setIsMobile(isMobileView);
+
+      if (isMobileView) {
+        setSidebarOpen(false);
+      } else {
         setSidebarOpen(true);
         setMobileSidebarOpen(false);
-      } else {
-        setSidebarOpen(false);
       }
     };
 
+    // Set initial state immediately
     handleResize();
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const [welcomeCardColor, setWelcomeCardColor] = useState(() => {
+    const savedColor = localStorage.getItem("welcomeCardColor");
+    if (savedColor) {
+      return savedColor;
+    }
+    const colors = ["blue", "green", "indigo", "purple", "teal"];
+    const initialColor = colors[Math.floor(Math.random() * colors.length)];
+    localStorage.setItem("welcomeCardColor", initialColor);
+    return initialColor;
+  });
+  const colorVariants = {
+    blue: "bg-blue-600",
+    green: "bg-green-600",
+    indigo: "bg-indigo-600",
+    purple: "bg-purple-600",
+    teal: "bg-teal-600",
+  };
+
   return (
-    <div
-      className="flex min-h-screen bg-gray-50"
-      
-    >
+    <div className="flex min-h-screen bg-gray-50">
       {/* Mobile Sidebar Backdrop */}
       {mobileSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
           onClick={closeMobileSidebar}
         />
       )}
 
       {/* Mobile Sidebar Toggle Button */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-30 p-2 rounded-md bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all active:scale-95"
-        onClick={toggleMobileSidebar}
-      >
-        {mobileSidebarOpen ? (
-          <X size={20} className="transition-transform duration-200" />
-        ) : (
-          <Menu size={20} className="transition-transform duration-200" />
-        )}
-      </button>
+      {isMobile && (
+        <button
+          className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all active:scale-95"
+          onClick={toggleMobileSidebar}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {mobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      )}
 
       {/* Sidebar */}
       <div
@@ -193,20 +220,20 @@ const UserDashboard = () => {
           mobileSidebarOpen
             ? "translate-x-0"
             : "-translate-x-full md:translate-x-0"
-        } bg-white shadow-lg p-4 flex flex-col fixed inset-y-0 left-0 z-20 transition-all duration-300 ease-in-out border-r border-gray-200`}
+        } bg-white shadow-lg p-4 flex flex-col fixed inset-y-0 left-0 z-30 transition-all duration-300 ease-in-out border-r pt-30 border-gray-200`}
       >
         <div className="flex-1 flex flex-col">
           {/* Sidebar Header */}
           <div className="flex items-center justify-between mb-8 pt-2">
             {sidebarOpen ? (
               <div className="flex items-center space-x-2 transition-all duration-200">
-                <HeartPulse className="text-blue-600 w-8 h-8 transition-transform hover:scale-110" />
+                <HeartPulse className="text-red-600 w-8 h-8 transition-transform hover:scale-110" />
                 <span className="text-xl font-bold text-gray-800 animate-fadeIn">
                   HeartCare
                 </span>
               </div>
             ) : (
-              <HeartPulse className="text-blue-600 w-8 h-8 mx-auto transition-transform hover:scale-110" />
+              <HeartPulse className="text-red-600 w-8 h-8 mx-auto transition-transform hover:scale-110" />
             )}
             {/* Desktop Toggle Button */}
             <button
@@ -223,15 +250,6 @@ const UserDashboard = () => {
 
           {/* Navigation Menu */}
           <nav className="flex-1 space-y-1">
-            <button
-              className={`flex items-center space-x-3 p-3 w-full rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-all duration-200 transform hover:translate-x-1 ${
-                !sidebarOpen ? "justify-center" : ""
-              }`}
-              onClick={() => {
-                navigate("/user/dashboard");
-                closeMobileSidebar();
-              }}
-            ></button>
             <button
               className={`flex items-center space-x-3 p-3 w-full rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-all duration-200 transform hover:translate-x-1 ${
                 !sidebarOpen ? "justify-center" : ""
@@ -308,7 +326,6 @@ const UserDashboard = () => {
         }`}
       >
         {/* Header */}
-        {/* Header */}
         <div className="bg-white mt-6 shadow-sm p-4 border-b border-gray-200">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-gray-800">
@@ -321,8 +338,20 @@ const UserDashboard = () => {
                 onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
                 className="flex items-center space-x-2 focus:outline-none group user-dropdown-button"
               >
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                  <User className="text-blue-600" size={16} />
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors overflow-hidden">
+                  {userData.profileImage ? (
+                    <img
+                      src={`${API_BASE_URL}/${userData.profileImage}`}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "";
+                      }}
+                    />
+                  ) : (
+                    <User className="text-blue-600" size={16} />
+                  )}
                 </div>
                 <div className="flex items-center">
                   <span className="text-gray-700 font-medium">
@@ -340,7 +369,6 @@ const UserDashboard = () => {
               {/* Dropdown Menu */}
               {isUserDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200 animate-scaleIn user-dropdown-container">
-                  {" "}
                   <button
                     onClick={() => {
                       navigate("/user/profile");
@@ -381,7 +409,9 @@ const UserDashboard = () => {
         {/* Dashboard Content */}
         <div className="p-6">
           {/* Welcome Card */}
-          <div className="bg-blue-600 text-white rounded-xl p-6 mb-6 shadow-md transition-all hover:shadow-lg">
+          <div
+            className={`${colorVariants[welcomeCardColor]} text-white rounded-xl p-6 mb-6 shadow-md hover:shadow-lg transition-all`}
+          >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-2xl font-bold mb-2">
@@ -495,7 +525,6 @@ const UserDashboard = () => {
                     today.setHours(0, 0, 0, 0);
                     return appointmentDate >= today;
                   })
-
                   .map((appt) => (
                     <div
                       key={appt._id}
@@ -523,15 +552,15 @@ const UserDashboard = () => {
                         <div className="flex items-center space-x-3">
                           <span
                             className={`
-            px-3 py-1 rounded-full text-xs font-medium transition-all 
-          ${
-            appt.status === "Completed"
-              ? "bg-green-100 text-green-800"
-              : appt.status === "Pending"
-              ? "bg-red-100 text-red-800"
-              : "bg-yellow-100 text-yellow-800"
-          }
-  `}
+                              px-3 py-1 rounded-full text-xs font-medium transition-all 
+                              ${
+                                appt.status === "Completed"
+                                  ? "bg-green-100 text-green-800"
+                                  : appt.status === "Pending"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }
+                            `}
                           >
                             {appt.status}
                           </span>
@@ -661,6 +690,14 @@ const UserDashboard = () => {
         }
         .animate-scaleIn {
           animation: scaleIn 0.2s ease-out forwards;
+        }
+        @media (max-width: 767px) {
+          body {
+            overflow-x: hidden;
+          }
+          .mobile-toggle-button {
+            display: flex !important;
+          }
         }
       `}</style>
     </div>

@@ -5,6 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
+import { Navigate, useNavigate } from "react-router";
 
 const EditProfileUser = () => {
   const [user, setUser] = useState({
@@ -14,6 +15,7 @@ const EditProfileUser = () => {
     oldPassword: "",
     newPassword: "",
   });
+  const navigate = useNavigate();
 
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -47,7 +49,7 @@ const EditProfileUser = () => {
     try {
       const token = localStorage.getItem("token");
       const decoded = jwtDecode(token);
-      await API.put(
+      await API.patch(
         `/api/user/update/${decoded.id}`,
         {
           name: user.name,
@@ -60,7 +62,10 @@ const EditProfileUser = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success("Profile updated successfully");
+      toast.success("Profile updated successfully, Rediercting Back..");
+      setTimeout(() => {
+        navigate("/userDashboard");
+      }, 1500);
     } catch (error) {
       toast.error(error.response?.data?.message || "Error updating profile");
     }

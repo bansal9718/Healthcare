@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import API from "../../../api";
-import { useNavigate, Link } from "react-router";
+import { useNavigate } from "react-router";
 
 const UserManagement = () => {
+  
   const [users, setUsers] = useState([]);
   const [appointments, setAppointments] = useState({});
   const [search, setSearch] = useState("");

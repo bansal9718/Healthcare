@@ -8,7 +8,7 @@ const ServiceCard = ({ title, description, icon, price }) => {
       <p className="text-gray-600 mt-2">{description}</p>
       {price && (
         <div className="mt-3 text-blue-600 text-lg font-medium">₹{price}</div>
-      )}{" "}
+      )}
     </div>
   );
 };

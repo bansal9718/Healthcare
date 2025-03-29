@@ -1,5 +1,5 @@
 const User = require("../Models/UserModel");
-
+const bcrypt = require('bcryptjs')
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -97,5 +97,6 @@ const deleteUser = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 module.exports = { getAllUsers, getUser, updateUserPartial, deleteUser };

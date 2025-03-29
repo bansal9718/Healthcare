@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import API from "../../../api";
 
-import axios from "axios";
 import { motion } from "framer-motion";
 import { MdClose } from "react-icons/md";
 import { useNavigate } from "react-router";

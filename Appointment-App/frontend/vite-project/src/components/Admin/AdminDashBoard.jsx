@@ -30,8 +30,12 @@ const AdminDashboard = () => {
   const [appointmentCount, setAppointmentCount] = useState(0);
   const [currentCount, setCurrentCount] = useState(0);
   const [recentAppointments, setRecentAppointments] = useState([]);
+
+  //Sidebar States
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
   const [userCount, setUserCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -41,6 +45,17 @@ const AdminDashboard = () => {
   );
 
   const navigate = useNavigate();
+
+  const toggleSideBar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+  const closeMobileSidebar = () => {
+    setMobileSidebarOpen(false);
+  };
+  const toggleMobileSidebar = () => {
+    setMobileSidebarOpen(!mobileSidebarOpen);
+    setSidebarOpen(!sidebarOpen);
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -129,6 +144,28 @@ const AdminDashboard = () => {
     generateThought();
   }, []);
 
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+        setMobileSidebarOpen(false);
+      }
+    };
+
+    // Check immediately on mount
+    checkScreenSize();
+
+    // Set up event listener
+    window.addEventListener("resize", checkScreenSize);
+
+    // Clean up
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   const handleUpdateStatus = async (id, currentStatus) => {
     const token = localStorage.getItem("token");
     let newStatus;
@@ -176,17 +213,28 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
+      {/* Mobile Sidebar Backdrop */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
+          onClick={closeMobileSidebar}
+        />
+      )}
+
       {/* Mobile Sidebar Toggle */}
-      <button
-        className="md:hidden fixed top-6 left-6 z-30 p-2 rounded-full bg-white shadow-lg border border-gray-200 hover:bg-gray-100 transition-all"
-        onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-      >
-        {mobileSidebarOpen ? (
-          <X className="text-red-600" />
-        ) : (
-          <Menu className="text-red-600" />
-        )}
-      </button>
+      {isMobile && (
+        <button
+          className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all active:scale-95"
+          onClick={toggleMobileSidebar}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {mobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      )}
 
       {/* Sidebar - Full Height */}
       <div
@@ -194,8 +242,9 @@ const AdminDashboard = () => {
           mobileSidebarOpen
             ? "translate-x-0"
             : "-translate-x-full md:translate-x-0"
-        } bg-gradient-to-b from-white to-gray-50 shadow-xl p-5 flex flex-col fixed inset-y-0 left-0 z-20 transition-all duration-300 border-r border-gray-200`}
+        } bg-gradient-to-b from-white to-gray-50 shadow-xl p-5 flex flex-col fixed inset-y-0 left-0 z-20 transition-all duration-300 border-r border-gray-200 pt-30`}
       >
+        {/* Rest of your sidebar content remains the same */}
         <div className="flex-1 flex flex-col">
           <div className="flex items-center justify-between mb-8">
             {sidebarOpen && (
@@ -208,7 +257,7 @@ const AdminDashboard = () => {
             )}
             <button
               className="hidden md:flex items-center justify-center p-2 rounded-full bg-white shadow-sm hover:bg-gray-100"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={toggleSideBar}
             >
               {sidebarOpen ? (
                 <ChevronLeft className="text-gray-600" />
@@ -284,7 +333,7 @@ const AdminDashboard = () => {
       <div
         className={`flex-1 transition-all duration-300 ${
           sidebarOpen ? "md:ml-72" : "md:ml-24"
-        } p-6`}
+        } p-6 mt-25`}
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-8">

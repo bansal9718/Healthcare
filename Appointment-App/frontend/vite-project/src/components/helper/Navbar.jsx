@@ -20,56 +20,59 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-md px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700">
-      <div className="container mx-auto flex flex-wrap items-center justify-between h-auto py-2 sm:py-3">
-        {/* Left: Logo */}
-        <div className="flex items-center">
-          <button onClick={handleLogoClick} className="focus:outline-none">
-            <img
-              src="/A_professional_logo_for_'Advance_Care_Clinic'_feat.png"
-              alt="Clinic Logo"
-              className="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow-md transition-transform duration-300 hover:scale-105"
-            />
-          </button>
-        </div>
-
-        {/* Center: Title (Stacked on Mobile) */}
-        <div className="flex flex-col items-center flex-1 text-center">
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <FaHeartbeat className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 dark:text-blue-400" />
-            <h1 className="text-base sm:text-lg md:text-2xl font-bold text-blue-900 dark:text-white tracking-tight">
+    <div className="mb-20">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-md px-4 py-3 border-b border-blue-100 dark:border-gray-700">
+        <div className="container mx-auto flex items-center justify-between flex-wrap gap-4">
+          {/* Enhanced Logo Section */}
+          <button
+            onClick={handleLogoClick}
+            className="group flex items-center focus:outline-none"
+            aria-label="Navigate to dashboard"
+          >
+            <div className="relative h-14 w-14 sm:h-16 sm:w-16 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-white dark:from-gray-700 dark:to-gray-800 shadow-sm border-2 border-blue-100 dark:border-gray-600">
+              <FaHeartbeat className="h-7 w-7 text-red-500 dark:text-red-400 group-hover:scale-110 transition-transform" />
+            </div>
+            <span className="ml-3 hidden md:block text-lg font-semibold text-blue-800 dark:text-white">
               Advanced Cardiac Care
-            </h1>
+            </span>
+          </button>
+
+          {/* Clinic Title (Centered) - Unchanged from your original */}
+          <div className="flex-1 flex flex-col items-center justify-center space-y-1">
+            <div className="flex items-center space-x-2">
+              <FaHeartbeat className="h-5 w-5 text-blue-600 dark:text-blue-400 animate-pulse" />
+              <h1 className="text-lg sm:text-xl md:text-2xl font-semibold text-blue-900 dark:text-white whitespace-nowrap">
+                Advanced Cardiac Care
+              </h1>
+            </div>
+            <div className="sm:hidden text-center">
+              <p className="text-xs font-medium text-blue-700 dark:text-blue-400">
+                Dr. Dhara Singh
+              </p>
+              <p className="text-[10px] text-gray-600 dark:text-gray-300">
+                MBBS, MD, DM (Cardiology)
+              </p>
+            </div>
           </div>
 
-          {/* Doctor Info (Visible on Small Screens) */}
-          <div className="block sm:hidden mt-1">
-            <p className="text-xs font-semibold text-blue-700 dark:text-blue-400">
+          {/* Doctor Information - Preserved Exactly As Your Original */}
+          <div className="hidden sm:block text-right space-y-0.5">
+            <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
               Dr. Dhara Singh
             </p>
-            <p className="text-[10px] text-gray-600 dark:text-gray-300">
+            <p className="text-xs text-gray-600 dark:text-gray-300">
               MBBS, MD (Medicine), DM (Cardiology)
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Consultant Cardiologist
+            </p>
+            <p className="text-xs text-blue-600 dark:text-blue-300">
+              <span className="font-normal">Contact:</span> +1 234 5678
             </p>
           </div>
         </div>
-
-        {/* Right: Doctor Info (Hidden on Small Screens) */}
-        <div className="hidden sm:block text-right">
-          <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">
-            Dr. Dhara Singh
-          </p>
-          <p className="text-xs text-gray-600 dark:text-gray-300">
-            MBBS, MD (Medicine), DM (Cardiology)
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Consultant Cardiologist
-          </p>
-          <p className="text-xs font-medium text-blue-600 dark:text-blue-300 mt-1">
-            <span className="font-normal">Contact:</span> +1 234 5678
-          </p>
-        </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 };
 

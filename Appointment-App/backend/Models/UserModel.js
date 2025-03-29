@@ -25,7 +25,10 @@ const UserSchema = new mongoose.Schema(
         message: "Phone number must be exactly 10 digits (e.g., '9876543210')",
       },
     },
-
+    profileImage: {
+      type: String,
+      default: "",
+    },
     email: {
       type: String,
       required: true,

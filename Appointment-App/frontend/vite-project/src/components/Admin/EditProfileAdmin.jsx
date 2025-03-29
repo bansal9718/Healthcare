@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import API from "../../../api";
-import axios from "axios";
 import { useNavigate } from "react-router";
 import { User, Lock, Mail, ArrowLeft } from "lucide-react";
 
@@ -50,7 +49,7 @@ const EditProfileAdmin = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await API.put("/api/admin/edit-profile", admin, {
+      await API.patch("/api/admin/edit-profile", admin, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessage({
@@ -69,7 +68,13 @@ const EditProfileAdmin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div
+      className="flex items-center justify-center min-h-screen bg-cover bg-center p-6"
+      style={{
+        backgroundImage:
+          "linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.5)), url('/editAdmin.avif')",
+      }}
+    >
       <div className="w-full max-w-md bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Header */}
         <div className="bg-blue-700 px-6 py-4 flex items-center">

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import API from "../../../api";
 import { Calendar, Clock, User, Phone } from "lucide-react";
 
@@ -48,7 +47,7 @@ const TodayAppointments = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 mt-30">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
         Today's Appointments
       </h2>

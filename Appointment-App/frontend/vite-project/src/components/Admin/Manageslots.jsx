@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import API from "../../../api";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { MdAdd, MdDelete } from "react-icons/md";
-import { Calendar, Clock, AlertCircle, CheckCircle } from "react-feather";
+import { MdDelete } from "react-icons/md";
+import { Calendar, Clock, AlertCircle } from "react-feather";
 import AddSlot from "./AddSlot";
 
 const ManageSlots = () => {
@@ -55,7 +55,7 @@ const ManageSlots = () => {
   };
 
   return (
-    <div className="p-6 min-h-screen bg-gray-50">
+    <div className="p-6 min-h-screen mt-25 bg-gray-50">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-semibold text-gray-800">
@@ -66,7 +66,7 @@ const ManageSlots = () => {
 
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
           <h2 className="text-lg font-medium text-gray-700 mb-4">
-            Search Available Slots
+            Check for Slots
           </h2>
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">

@@ -10,7 +10,7 @@ echo "Build completed successfully!"
 
 # Start backend
 echo "Starting backend..."
-npm start &  # Runs backend in the background
+npm run dev &  # Runs backend in the background
 
 # Start frontend
 echo "Starting frontend..."

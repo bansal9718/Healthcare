@@ -134,7 +134,7 @@ const HomePage = () => {
                 >
                   {feature.contact && (
                     <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-bl-lg rounded-tr-lg">
-                      CALL NOW
+                      <a href="tel:+919893210862"> CALL NOW</a>
                     </div>
                   )}
                   <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto">
@@ -237,83 +237,111 @@ const HomePage = () => {
       </div>
 
       {/* Footer Contact */}
+      {/* Footer Contact */}
       <footer className="bg-gray-800 text-white py-8 px-4">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Contact Details */}
+          {/* Contact Details - Mobile Center, Desktop Left */}
           <div className="flex flex-col items-center md:items-start">
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <div className="flex items-center mb-2">
-              <FaPhoneAlt className="mr-2" />
-              <a href="tel:+919893210862" className="hover:text-gray-300">
-                +91-9893210862
-              </a>
+            <h3 className="text-lg font-semibold mb-4 text-center md:text-left">
+              Contact Us
+            </h3>
+            <div className="flex flex-col space-y-3 w-full">
+              <div className="flex items-center justify-center md:justify-start">
+                <FaPhoneAlt className="mr-2 min-w-[16px]" />
+                <a
+                  href="tel:+919893210862"
+                  className="hover:text-gray-300 text-sm md:text-base"
+                >
+                  +91-9893210862
+                </a>
+              </div>
+              <div className="flex items-center justify-center md:justify-start">
+                <FaEnvelope className="mr-2 min-w-[16px]" />
+                <a
+                  href="mailto:info@yourclinic.com"
+                  className="hover:text-gray-300 text-sm md:text-base"
+                >
+                  info@yourclinic.com
+                </a>
+              </div>
+              <p className="text-xs md:text-sm text-gray-400 text-center md:text-left">
+                Monday - Friday, 8:00 AM - 7:00 PM EST
+              </p>
             </div>
-            <div className="flex items-center mb-2">
-              <FaEnvelope className="mr-2" />
-              <a
-                href="mailto:info@yourclinic.com"
-                className="hover:text-gray-300"
-              >
-                info@yourclinic.com
-              </a>
-            </div>
-            <p className="text-sm text-gray-400">
-              Monday - Friday, 8:00 AM - 7:00 PM EST
-            </p>
           </div>
 
-          {/* Clinic Address */}
+          {/* Clinic Address - Mobile Center, Desktop Left */}
           <div className="flex flex-col items-center md:items-start">
-            <h3 className="text-lg font-semibold mb-4">Clinic Address</h3>
-            <div className="flex items-start mb-2">
+            <h3 className="text-lg font-semibold mb-4 text-center md:text-left">
+              Clinic Address
+            </h3>
+            <div className="flex flex-col items-center md:items-start">
               <a
                 href={googleMapsAddress}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start"
+                className="flex flex-col items-center md:items-start"
               >
-                <FaMapMarkerAlt className="mr-2" />
-                <address className="not-italic">
-                  HeartCare Speciality Clinic
-                  <br />
-                  123 Medical Tower, Health District
-                  <br />
-                  Gwalior, India 474001
-                </address>
+                <div className="flex items-start">
+                  <FaMapMarkerAlt className="mr-2 mt-1 min-w-[16px]" />
+                  <address className="not-italic text-sm md:text-base text-center md:text-left">
+                    HeartCare Speciality Clinic
+                    <br />
+                    123 Medical Tower, Health District
+                    <br />
+                    Gwalior, India 474001
+                  </address>
+                </div>
               </a>
             </div>
           </div>
 
-          {/* Quick Links (Optional) */}
+          {/* Quick Links - Mobile Center, Desktop Left */}
           <div className="flex flex-col items-center md:items-start">
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="/about" className="hover:text-gray-300">
+            <h3 className="text-lg font-semibold mb-4 text-center md:text-left">
+              Quick Links
+            </h3>
+            <ul className="grid grid-cols-2 gap-x-8 gap-y-2 md:flex md:flex-col md:space-y-2">
+              <li className="text-center md:text-left">
+                <a
+                  href="/about"
+                  className="hover:text-gray-300 text-sm md:text-base"
+                >
                   About Us
                 </a>
               </li>
-              <li>
-                <a href="/services" className="hover:text-gray-300">
+              <li className="text-center md:text-left">
+                <a
+                  href="/services"
+                  className="hover:text-gray-300 text-sm md:text-base"
+                >
                   Services
                 </a>
               </li>
-              <li>
-                <a href="/appointments" className="hover:text-gray-300">
+              <li className="text-center md:text-left">
+                <a
+                  href="/appointments"
+                  className="hover:text-gray-300 text-sm md:text-base"
+                >
                   Appointments
                 </a>
               </li>
-              <li>
-                <a href="/contact" className="hover:text-gray-300">
+              <li className="text-center md:text-left">
+                <a
+                  href="/contact"
+                  className="hover:text-gray-300 text-sm md:text-base"
+                >
                   Contact
                 </a>
               </li>
             </ul>
           </div>
         </div>
-        <div className="mt-8 text-center text-gray-400">
+
+        {/* Copyright - Always Centered */}
+        <div className="mt-8 text-center text-gray-400 text-xs md:text-sm">
           <p>
-            &copy; {new Date().getFullYear()} Advanced Cardiac Care . All rights
+            &copy; {new Date().getFullYear()} Advanced Cardiac Care. All rights
             reserved.
           </p>
         </div>

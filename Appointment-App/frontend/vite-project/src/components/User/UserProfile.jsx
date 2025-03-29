@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import API from "../../../api";
+
 import {
   ClipboardList,
   Clock,
@@ -13,6 +14,7 @@ import {
   HeartPulse,
   Edit,
   Camera,
+  Loader2,
 } from "lucide-react";
 
 const UserProfile = () => {
@@ -22,7 +24,9 @@ const UserProfile = () => {
   const [error, setError] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
+  const API_BASE_URL = "https://healthcare-9uj8.onrender.com";
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -59,9 +63,7 @@ const UserProfile = () => {
 
         // Set profile image if exists
         if (userRes.data.user.profileImage) {
-          setImagePreview(
-            `http://localhost:8000/${userRes.data.user.profileImage}`
-          );
+          setImagePreview(`${API_BASE_URL}/${userRes.data.user.profileImage}`);
         }
       } catch (error) {
         setError(error.response?.data?.message || "Error fetching data");
@@ -80,38 +82,56 @@ const UserProfile = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file type and size
+      if (!file.type.match("image.*")) {
+        setError("Please select an image file");
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        // 2MB limit
+        setError("Image size should be less than 2MB");
+        return;
+      }
+
       setProfileImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+      setError(""); // Clear any previous errors
     }
   };
 
   const uploadProfileImage = async () => {
     try {
+      setUploading(true);
       const token = localStorage.getItem("token");
       if (!token || !profileImage) return;
 
       const formData = new FormData();
       formData.append("profileImage", profileImage);
 
-      const response = await API.post(
-        `/api/user/upload-profile-image`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await API.post(`/api/user/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       setUser({ ...user, profileImage: response.data.profileImage });
       setError("");
+      toast.success("Profile image updated successfully!");
+      navigate("/userDashboard");
     } catch (error) {
-      setError(error.response?.data?.message || "Error uploading image");
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Error uploading image"
+      );
+      toast.error("Failed to upload image");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -178,9 +198,11 @@ const UserProfile = () => {
           <div className="mt-4 flex justify-end">
             <button
               onClick={uploadProfileImage}
-              className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition-colors"
+              disabled={uploading}
+              className="flex items-center bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 transition-colors disabled:bg-green-400"
             >
-              Save Profile Image
+              {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {uploading ? "Uploading..." : "Save Profile Image"}
             </button>
           </div>
         )}

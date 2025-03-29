@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const profileImageController = require("../Controllers/profileImagecontroller");
 
 const {
   authMiddleware,
@@ -26,5 +27,11 @@ router.put(
   authMiddleware,
   adminMiddleware,
   AdminController.updateAdminProfile
+);
+
+router.post(
+  "/upload",
+  authMiddleware,
+  profileImageController.uploadProfileImage
 );
 module.exports = router;
