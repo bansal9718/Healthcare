@@ -7,7 +7,7 @@ const app = express();
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const UserRoutes = require("./Routes/UserRoutes");
-const AuthenticationRoutes = require("./Routes/AutheticationRoutes"); 
+const AuthenticationRoutes = require("./Routes/AutheticationRoutes");
 const AppointmentRoutes = require("./Routes/AppointmentRoutes");
 const AdminRoutes = require("./Routes/AdminRoutes");
 const paymentRoutes = require("./Routes/PaymentRoutes");
@@ -15,7 +15,7 @@ const paymentRoutes = require("./Routes/PaymentRoutes");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = ["https://advancedcardiaccare.netlify.app"]; 
+const allowedOrigins = ["https://advancedcardiaccare.netlify.app"];
 
 app.use(
   cors({

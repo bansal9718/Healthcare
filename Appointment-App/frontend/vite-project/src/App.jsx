@@ -18,6 +18,9 @@ import UserProfile from "./components/User/UserProfile";
 import PaymentForm from "./components/Auth/PaymentForm";
 import UserDetails from "./components/Admin/UserDetails";
 import TodayAppointments from "./components/Admin/TodayAppointments";
+import ServicePage from "./components/helper/ServicePage";
+import ResetPassword from "./components/Auth/ResetPassword";
+import ForgotPassword from "./components/Auth/ForgotPassword";
 
 function App() {
   return (
@@ -42,6 +45,9 @@ function App() {
         <Route path="/user/payment" element={<PaymentForm />} />
         <Route path="user-details/:id" element={<UserDetails />} />
         <Route path="/user/todayAppointments" element={<TodayAppointments />} />
+        <Route path="/services" element={<ServicePage />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     </BrowserRouter>
   );

@@ -95,12 +95,19 @@ const Login = () => {
               required
             />
           </div>
-
+          {/* <div className="text-right text-sm">
+            <span
+              onClick={() => navigate("/forgot-password")}
+              className="text-blue-600 hover:underline cursor-pointer"
+            >
+              Forgot Password?
+            </span>
+          </div> */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center text-sm md:text-base"
+            className="w-full bg-blue-600 cursor-pointer text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center text-sm md:text-base"
           >
-            <Lock className="mr-2" size={16} />
+            <Lock className="mr-2 " size={16} />
             Sign In
           </button>
         </form>

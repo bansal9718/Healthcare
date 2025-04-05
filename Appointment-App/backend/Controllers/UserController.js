@@ -1,5 +1,6 @@
 const User = require("../Models/UserModel");
-const bcrypt = require('bcryptjs')
+const bcrypt = require("bcryptjs");
+
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -83,20 +84,23 @@ const updateUserPartial = async (req, res) => {
 
 const deleteUser = async (req, res) => {
   try {
-    const { id } = req.params; // Get ID from URL
+    const { id } = req.params;
 
+    // Delete the user
     const deletedUser = await User.findByIdAndDelete(id);
-
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.status(200).json({ message: "User deleted successfully" });
+    await Appointment.deleteMany({ user: id });
+
+    return res
+      .status(200)
+      .json({ message: "User and related data deleted successfully" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
-
 
 module.exports = { getAllUsers, getUser, updateUserPartial, deleteUser };

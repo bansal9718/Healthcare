@@ -192,7 +192,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center text-sm md:text-base"
+            className="w-full bg-blue-600 cursor-pointer text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center text-sm md:text-base"
           >
             {isLoading ? (
               <>
@@ -219,7 +219,7 @@ const Register = () => {
                 Creating Account...
               </>
             ) : (
-              "Complete Registration"
+              "Register"
             )}
           </button>
         </form>

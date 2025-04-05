@@ -1,12 +1,17 @@
 const User = require("../Models/UserModel");
-
+const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail")
 const bcrypt = require("bcryptjs");
 
 const register = async (req, res) => {
   try {
     const { username, age, phoneNumber, email, password, adminKey } = req.body;
 
-    // Improved phone number validation
+    // Capitalize first letter of username
+    const capitalizedUsername =
+      username.charAt(0).toUpperCase() + username.slice(1);
+
     const phoneRegex = /^\+?\d{1,4}?\d{9,15}$/;
     if (!phoneRegex.test(phoneNumber)) {
       return res.status(400).json({
@@ -15,7 +20,6 @@ const register = async (req, res) => {
       });
     }
 
-    // Check if phone number is at least 10 digits (excluding country code)
     const digitsOnly = phoneNumber.replace(/\D/g, "");
     if (digitsOnly.length < 10) {
       return res.status(400).json({
@@ -24,7 +28,6 @@ const register = async (req, res) => {
     }
 
     const existsingUser = await User.findOne({ email });
-
     if (existsingUser) {
       return res.status(400).json({ message: "User Already exists" });
     }
@@ -35,7 +38,7 @@ const register = async (req, res) => {
     }
 
     const user = await User.create({
-      username,
+      username: capitalizedUsername,
       age,
       phoneNumber,
       email,
@@ -98,4 +101,70 @@ const logout = async (req, res) => {
   }
 };
 
-module.exports = { register, login, logout };
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Generate reset token
+    const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
+
+    const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+   
+    // Email content
+    const html = `
+      <h2>Password Reset Request</h2>
+      <p>Hello ${user.username},</p>
+      <p>Click the button below to reset your password:</p>
+      <a href="${resetLink}" style="padding: 10px 20px; background: #007bff; color: white; text-decoration: none;">Reset Password</a>
+      <p>This link will expire in 15 minutes.</p>
+    `;
+
+    await sendEmail(user.email, "Reset Your Password", html);
+
+    res.status(200).json({
+      message: "Password reset link sent to your email",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: resetTokenHash,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.password = newPassword; // It will be hashed automatically in pre-save
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    return res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { register, login, logout, forgotPassword, resetPassword };

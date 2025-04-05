@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+
 import API from "../../../api";
 
 import {
@@ -26,6 +28,7 @@ const UserProfile = () => {
   const [imagePreview, setImagePreview] = useState("");
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
+
   const API_BASE_URL = "https://healthcare-9uj8.onrender.com";
 
   const formatDate = (dateString) => {
@@ -132,6 +135,37 @@ const UserProfile = () => {
       toast.error("Failed to upload image");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone!"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Not authenticated");
+        return;
+      }
+      const decoded = jwtDecode(token);
+
+      await API.delete(`/api/user/delete/${decoded.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success("Account deleted successfully");
+      localStorage.removeItem("token");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete account");
     }
   };
 
@@ -308,7 +342,14 @@ const UserProfile = () => {
           </div>
         )}
       </div>
-
+      <div className="flex justify-end mt-6">
+        <button
+          onClick={handleDeleteAccount}
+          className="flex items-center space-x-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+        >
+          <span>Delete Account</span>
+        </button>
+      </div>
       {error && (
         <div className="mt-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
           <div className="flex items-center">
@@ -331,6 +372,7 @@ const UserProfile = () => {
           </div>
         </div>
       )}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };
