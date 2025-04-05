@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Mail, SendHorizonal, AlertCircle, CheckCircle } from "lucide-react";
-import axios from "axios";
 import API from "../../../api"; // adjust if needed
 import { useNavigate } from "react-router";
 
@@ -75,7 +74,7 @@ const ForgotPassword = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center"
+            className="w-full bg-blue-600 cursor-pointer text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center"
           >
             <SendHorizonal size={16} className="mr-2" />
             {loading ? "Sending..." : "Send Reset Link"}

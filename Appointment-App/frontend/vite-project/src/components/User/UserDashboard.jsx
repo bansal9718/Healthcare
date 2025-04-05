@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import API from "../../../api";
 import {
   User,
@@ -90,7 +90,8 @@ const UserDashboard = () => {
         });
         setUserData(res.data.user);
       } catch (err) {
-        toast.error("Error fetching user data.");
+        console.error(err);
+        // toast.error("Error fetching user data.");
       } finally {
         setLoading(false);
       }
@@ -137,7 +138,7 @@ const UserDashboard = () => {
         setAppointments(res.data.appointments);
         setRecentAppointments(res.data.appointments);
       } catch (error) {
-        toast.error("Error fetching appointments.");
+        console.error(error);
       }
     };
     fetchAppointments();
@@ -466,17 +467,19 @@ const UserDashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 transition-all hover:shadow-md hover:-translate-y-1">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 text-sm">Services</p>
-                  <h3 className="text-2xl font-bold mt-1">6</h3>
-                </div>
-                <div className="bg-purple-100 p-3 rounded-lg transition-transform hover:scale-110">
-                  <HeartPulse className="text-purple-600" size={20} />
+            <Link to="/services">
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 transition-all hover:shadow-md hover:-translate-y-1">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-500 text-sm">Services</p>
+                    <h3 className="text-2xl font-bold mt-1">13</h3>
+                  </div>
+                  <div className="bg-purple-100 p-3 rounded-lg transition-transform hover:scale-110">
+                    <HeartPulse className="text-purple-600" size={20} />
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Appointments Section */}

@@ -1,16 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import axios from "axios";
-import { HeartPulse, Lock, Mail, UserPlus, AlertCircle } from "lucide-react";
+import {
+  HeartPulse,
+  Lock,
+  Mail,
+  UserPlus,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import API from "../../../api";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,6 +25,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
     try {
       const res = await API.post("/api/auth/login", formData);
@@ -31,9 +38,11 @@ const Login = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
+    } finally {
+      setIsLoading(false);
     }
   };
-
+  console.log(showPassword);
   return (
     <div
       className="flex items-center justify-center min-h-screen bg-cover bg-center p-6"
@@ -56,7 +65,7 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Error Message */}
+        {/* Error */}
         {error && (
           <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg flex items-start">
             <AlertCircle className="mr-2 flex-shrink-0" size={16} />
@@ -64,8 +73,9 @@ const Login = () => {
           </div>
         )}
 
-        {/* Login Form */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          {/* Email */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Mail className="text-gray-400" size={18} />
@@ -81,38 +91,83 @@ const Login = () => {
             />
           </div>
 
+          {/* Password */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Lock className="text-gray-400" size={18} />
             </div>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Password"
-              className="w-full pl-10 pr-3 py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-10 py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={formData.password}
               onChange={handleChange}
               required
             />
+
+            <div
+              className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4 text-gray-400" />
+              ) : (
+                <Eye className="h-4 w-4 text-gray-400" />
+              )}
+            </div>
           </div>
-          {/* <div className="text-right text-sm">
+
+          {/* Forgot Password */}
+          <div className="text-right text-sm">
             <span
               onClick={() => navigate("/forgot-password")}
               className="text-blue-600 hover:underline cursor-pointer"
             >
               Forgot Password?
             </span>
-          </div> */}
+          </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 cursor-pointer text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center text-sm md:text-base"
+            disabled={isLoading}
+            className="w-full bg-blue-600  cursor-pointer text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center text-sm md:text-base"
           >
-            <Lock className="mr-2 " size={16} />
-            Sign In
+            {isLoading ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Signing In...
+              </>
+            ) : (
+              <>
+                <Lock className="mr-2" size={16} />
+                Sign In
+              </>
+            )}
           </button>
         </form>
 
-        {/* Footer Links */}
+        {/* Footer */}
         <div className="mt-6 pt-4 border-t border-gray-100">
           <div className="flex flex-col space-y-3 text-center">
             <p className="text-xs md:text-sm text-gray-600">

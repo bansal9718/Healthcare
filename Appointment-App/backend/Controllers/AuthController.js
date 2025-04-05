@@ -1,7 +1,7 @@
 const User = require("../Models/UserModel");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const sendEmail = require("../utils/sendEmail")
+const sendEmail = require("../utils/sendEmail");
 const bcrypt = require("bcryptjs");
 
 const register = async (req, res) => {
@@ -114,15 +114,14 @@ const forgotPassword = async (req, res) => {
     });
 
     const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-   
+
     // Email content
     const html = `
-      <h2>Password Reset Request</h2>
-      <p>Hello ${user.username},</p>
-      <p>Click the button below to reset your password:</p>
-      <a href="${resetLink}" style="padding: 10px 20px; background: #007bff; color: white; text-decoration: none;">Reset Password</a>
-      <p>This link will expire in 15 minutes.</p>
-    `;
+    <h2>Reset Your Password</h2>
+    <p>Click the link below to reset your password:</p>
+    <a href="${resetLink}">${resetLink}</a>
+    <p>If you didn’t request this, please ignore this email.</p>
+  `;
 
     await sendEmail(user.email, "Reset Your Password", html);
 
@@ -136,34 +135,21 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
   try {
-    const { token } = req.params;
-    const { newPassword } = req.body;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
 
-    const resetTokenHash = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    const user = await User.findOne({
-      resetPasswordToken: resetTokenHash,
-      resetPasswordExpire: { $gt: Date.now() },
-    });
-
-    if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
-    }
-
-    user.password = newPassword; // It will be hashed automatically in pre-save
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-
+    user.password = newPassword;
     await user.save();
 
-    return res.status(200).json({ message: "Password reset successful" });
-  } catch (error) {
-    console.error("Reset Password Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (err) {
+    return res.status(400).json({ message: "Invalid or expired token" });
   }
 };
 

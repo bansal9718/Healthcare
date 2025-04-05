@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 import {
   Elements,
   CardElement,

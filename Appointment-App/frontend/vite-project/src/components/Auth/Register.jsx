@@ -10,6 +10,8 @@ import {
   HeartPulse,
   AlertCircle,
   ChevronRight,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import API from "../../../api";
 
@@ -26,6 +28,7 @@ const Register = () => {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -52,6 +55,11 @@ const Register = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleAgeChange = (e) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 3);
+    setFormData({ ...formData, age: value });
   };
 
   return (
@@ -100,8 +108,6 @@ const Register = () => {
               type: "number",
               placeholder: "Age",
               required: true,
-              min: 18,
-              max: 120,
             },
             {
               icon: <User className="h-4 w-4 text-gray-400" />,
@@ -122,6 +128,7 @@ const Register = () => {
               type: "tel",
               placeholder: "Phone Number",
               required: true,
+              pattern: "\\d{10}",
             },
             {
               icon: <Mail className="h-4 w-4 text-gray-400" />,
@@ -137,6 +144,7 @@ const Register = () => {
               placeholder: "Create Password (min 8 characters)",
               required: true,
               minLength: 8,
+              pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
             },
           ].map((field, index) => (
             <div key={index} className="relative">
@@ -163,6 +171,33 @@ const Register = () => {
                     ))}
                   </select>
                 </>
+              ) : field.name === "password" ? (
+                <>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    {field.icon}
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name={field.name}
+                    className="w-full pl-10 pr-10 py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder={field.placeholder}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    required={field.required}
+                    minLength={field.minLength}
+                    pattern={field.pattern}
+                  />
+                  <div
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </div>
+                </>
               ) : (
                 <>
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -177,12 +212,13 @@ const Register = () => {
                     onChange={
                       field.name === "phoneNumber"
                         ? handlePhoneChange
+                        : field.name === "age"
+                        ? handleAgeChange
                         : handleChange
                     }
                     required={field.required}
-                    min={field.min}
-                    max={field.max}
                     minLength={field.minLength}
+                    pattern={field.pattern}
                   />
                 </>
               )}

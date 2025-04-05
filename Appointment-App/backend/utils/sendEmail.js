@@ -11,7 +11,7 @@ const sendEmail = async (to, subject, html) => {
     });
 
     const mailOptions = {
-      from: `"HeartCare Team" <${process.env.EMAIL_USER}>`,
+      from: `"HeartCare Support" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,
