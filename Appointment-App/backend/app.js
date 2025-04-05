@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 
 const app = express();
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const UserRoutes = require("./Routes/UserRoutes");
