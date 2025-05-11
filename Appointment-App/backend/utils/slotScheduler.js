@@ -32,8 +32,6 @@ const generateSlots = async () => {
     date.setDate(today.getDate() + i); // ✅ Correct date calculation
     const formattedDate = formatDate(date); // Convert date to YYYY-MM-DD format
 
-    console.log(`Generating slots for: ${formattedDate}`); // ✅ Debugging log
-
     for (const slot of slotTimes) {
       const existingSlot = await Slot.findOne({
         date: formattedDate,
@@ -51,7 +49,6 @@ const generateSlots = async () => {
       }
     }
   }
-  console.log("✅ Slots generated for the next 30 days.");
 };
 
 const deleteOldSlots = async () => {
@@ -59,7 +56,6 @@ const deleteOldSlots = async () => {
   const formattedToday = formatDate(today);
 
   await Slot.deleteMany({ date: { $lt: formattedToday } });
-  console.log("🗑️ Old slots deleted.");
 };
 
 const slotScheduler = async () => {
@@ -68,7 +64,7 @@ const slotScheduler = async () => {
   setInterval(async () => {
     await generateSlots();
     await deleteOldSlots();
-  }, 24 * 60 * 60 * 1000); // Every 24 hours
+  }, 24 * 60 * 60 * 1000);
 };
 
 module.exports = slotScheduler;

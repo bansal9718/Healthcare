@@ -42,7 +42,6 @@ const Login = () => {
       setIsLoading(false);
     }
   };
-  console.log(showPassword);
   return (
     <div
       className="flex items-center justify-center min-h-screen bg-cover bg-center p-6"

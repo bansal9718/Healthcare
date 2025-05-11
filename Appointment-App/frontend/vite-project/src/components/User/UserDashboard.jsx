@@ -91,7 +91,6 @@ const UserDashboard = () => {
         setUserData(res.data.user);
       } catch (err) {
         console.error(err);
-        // toast.error("Error fetching user data.");
       } finally {
         setLoading(false);
       }
@@ -165,7 +164,6 @@ const UserDashboard = () => {
       }
     };
 
-    // Set initial state immediately
     handleResize();
 
     window.addEventListener("resize", handleResize);

@@ -80,6 +80,8 @@ const getUserAppointments = async (req, res) => {
       .populate("slot")
       .populate("user", "username email");
 
+
+
     return res.status(200).json({ appointments });
   } catch (error) {
     console.error(error);

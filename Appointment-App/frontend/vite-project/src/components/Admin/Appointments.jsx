@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { MdPerson, MdSchedule, MdPhone } from "react-icons/md";
 
 const Appointments = () => {
-  
   const [appointments, setAppointments] = useState([]);
   const [error, setError] = useState("");
 
