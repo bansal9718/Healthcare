@@ -1,4 +1,3 @@
-
 const Slot = require("../Models/SlotModel");
 const Appointment = require("../Models/AppointmentModel");
 
@@ -39,14 +38,12 @@ const getSlotsByDate = async (req, res) => {
       return res.status(400).json({ message: "Please provide the date" });
     }
 
-    const slotArray = await Slot.find({ date });
+    const slotArray = await Slot.find({ date }).sort({ sortOrder: 1 });
 
     if (slotArray.length === 0) {
-      return res
-        .status(404)
-        .json({
-          message: "No slots available for this Date! Try Another Date",
-        });
+      return res.status(404).json({
+        message: "No slots available for this Date! Try Another Date",
+      });
     }
 
     return res.status(200).json({

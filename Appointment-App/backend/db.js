@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 const app = require("./app");
-const slotScheduler = require("./utils/slotScheduler");
+const { slotScheduler } = require("./utils/slotScheduler"); // Adjust path as needed
 
 const connectDB = async () => {
   try {
@@ -15,7 +15,7 @@ const connectDB = async () => {
 
 connectDB();
 
-// slotScheduler()
+slotScheduler();
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

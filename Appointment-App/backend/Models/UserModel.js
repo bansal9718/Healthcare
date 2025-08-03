@@ -12,7 +12,6 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    // In your Mongoose schema (backend)
     phoneNumber: {
       type: String,
       required: [true, "Phone number is required"],

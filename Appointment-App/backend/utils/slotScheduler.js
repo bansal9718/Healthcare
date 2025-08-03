@@ -1,10 +1,9 @@
 const Slot = require("../Models/SlotModel");
-const mongoose = require("mongoose");
 
 const formatDate = (date) => {
-  const year = date.getFullYear().toString();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
@@ -14,57 +13,99 @@ const generateTimeSlots = () => {
     slots.push({
       startTime: `${hour.toString().padStart(2, "0")}:00`,
       endTime: `${hour.toString().padStart(2, "0")}:30`,
+      sortOrder: hour * 2,
     });
     slots.push({
       startTime: `${hour.toString().padStart(2, "0")}:30`,
       endTime: `${(hour + 1).toString().padStart(2, "0")}:00`,
+      sortOrder: hour * 2 + 1,
     });
   }
   return slots;
 };
 
 const generateSlots = async () => {
-  const slotTimes = generateTimeSlots(); // Generate time slots
-  const today = new Date();
+  try {
+    const slotTimes = generateTimeSlots();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  for (let i = 0; i < 30; i++) {
-    const date = new Date(); // ✅ Fix: Create a new Date object in each loop
-    date.setDate(today.getDate() + i); // ✅ Correct date calculation
-    const formattedDate = formatDate(date); // Convert date to YYYY-MM-DD format
+    const batchOperations = [];
 
-    for (const slot of slotTimes) {
-      const existingSlot = await Slot.findOne({
-        date: formattedDate,
-        startTime: slot.startTime,
-        endTime: slot.endTime,
-      });
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      const dateStr = formatDate(date);
 
-      if (!existingSlot) {
-        await Slot.create({
-          date: formattedDate, // Store date as string
-          startTime: slot.startTime,
-          endTime: slot.endTime,
-          isBooked: false,
+      slotTimes.forEach((slot) => {
+        batchOperations.push({
+          updateOne: {
+            filter: {
+              date: dateStr,
+              startTime: slot.startTime,
+            },
+            update: {
+              $setOnInsert: {
+                date: dateStr,
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+                isBooked: false,
+                sortOrder: slot.sortOrder,
+                dateTime: new Date(`${dateStr}T${slot.startTime}`),
+              },
+            },
+            upsert: true,
+          },
         });
-      }
+      });
     }
+
+    if (batchOperations.length > 0) {
+      await Slot.bulkWrite(batchOperations);
+    }
+  } catch (err) {
+    console.error("Error in generateSlots:", err);
   }
 };
 
 const deleteOldSlots = async () => {
-  const today = new Date();
-  const formattedToday = formatDate(today);
-
-  await Slot.deleteMany({ date: { $lt: formattedToday } });
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const result = await Slot.deleteMany({
+      dateTime: { $lt: today },
+    });
+    console.log(`Deleted ${result.deletedCount} old slots`);
+  } catch (err) {
+    console.error("Error deleting old slots:", err);
+  }
 };
 
 const slotScheduler = async () => {
-  await generateSlots();
-  await deleteOldSlots();
-  setInterval(async () => {
+  try {
     await generateSlots();
     await deleteOldSlots();
-  }, 24 * 60 * 60 * 1000);
+
+    const interval = setInterval(async () => {
+      try {
+        await generateSlots();
+        await deleteOldSlots();
+      } catch (err) {
+        console.error("Scheduled job error:", err);
+      }
+    }, 24 * 60 * 60 * 1000);
+
+    process.on("SIGTERM", () => clearInterval(interval));
+    process.on("SIGINT", () => clearInterval(interval));
+  } catch (err) {
+    console.error("Scheduler initialization error:", err);
+  }
 };
 
-module.exports = slotScheduler;
+module.exports = {
+  generateSlots,
+  deleteOldSlots,
+  slotScheduler,
+  generateTimeSlots, // Export for testing
+  formatDate, // Export for testing
+};

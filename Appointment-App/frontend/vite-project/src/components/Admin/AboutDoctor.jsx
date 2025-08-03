@@ -21,9 +21,9 @@ const AboutDoctor = () => {
       style={{
         backgroundImage:
           "linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5)), url('/doctor.webp')",
-        backgroundSize: "cover", // Ensures the image covers the entire div
-        backgroundPosition: "center", // Centers the image
-        backgroundRepeat: "no-repeat", // Prevents image repetition
+        backgroundSize: "cover", 
+        backgroundPosition: "center", 
+        backgroundRepeat: "no-repeat", 
         backgroundColor: "#176fc7",
       }}
     >

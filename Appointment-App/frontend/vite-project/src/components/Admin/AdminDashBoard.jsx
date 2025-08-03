@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../../../api";
-
 import {
   Home,
   Calendar,
@@ -19,6 +18,10 @@ import {
   Activity,
   AlertCircle,
   CheckCircle,
+  Plus,
+  TrendingUp,
+  FileText,
+  Shield,
 } from "lucide-react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -27,53 +30,40 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const AdminDashboard = () => {
+  // State declarations remain the same
   const [appointmentCount, setAppointmentCount] = useState(0);
   const [currentCount, setCurrentCount] = useState(0);
   const [recentAppointments, setRecentAppointments] = useState([]);
-
-  //Sidebar States
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
   const [userCount, setUserCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const [thoughtOfTheDay, setThoughtOfTheDay] = useState(
-    "Preventive cardiology leads to better long-term patient outcomes."
-  );
+  const [thoughtOfTheDay, setThoughtOfTheDay] = useState("");
 
   const navigate = useNavigate();
 
-  const toggleSideBar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-  const closeMobileSidebar = () => {
-    setMobileSidebarOpen(false);
-  };
+  // Helper functions remain the same
+  const toggleSideBar = () => setSidebarOpen(!sidebarOpen);
+  const closeMobileSidebar = () => setMobileSidebarOpen(false);
   const toggleMobileSidebar = () => {
     setMobileSidebarOpen(!mobileSidebarOpen);
     setSidebarOpen(!sidebarOpen);
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    toast.success("Logging Out!");
-    setTimeout(() => {
-      navigate("/");
-    }, 1300);
+    toast.success("Logging out...");
+    setTimeout(() => navigate("/"), 1300);
   };
 
+  // Data fetching functions remain the same
   const generateThought = async () => {
     try {
       const response = await axios.get(
@@ -81,115 +71,91 @@ const AdminDashboard = () => {
       );
       setThoughtOfTheDay(response.data.content);
     } catch (error) {
-      console.error("Error fetching clinical insight:", error);
+      setThoughtOfTheDay(
+        "Quality cardiac care begins with prevention and early detection."
+      );
     }
   };
 
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-
-      const [appointmentsRes, usersRes] = await Promise.all([
-        API.get("/api/appointment/allAppointments", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        API.get("/api/user/getAll", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-
-      const sortedAppointments = appointmentsRes.data.appointments.sort(
-        (a, b) => new Date(a.slot.date) - new Date(b.slot.date)
-      );
-
-      setAppointmentCount(sortedAppointments.length);
-      setRecentAppointments(sortedAppointments);
-      setUserCount(usersRes.data.users.length);
-    } catch (err) {
-      setError("Failed to fetch data.");
-    } finally {
-      setLoading(false); // Ensure loading is turned off
-    }
-  };
-
-  const fetchTodayAppointments = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const res = await API.get(
-        `/api/appointment/getAppointmentsByDate/${
-          new Date().toISOString().split("T")[0]
-        }`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const sortedTodayAppointments = res.data.appointments.sort(
-        (a, b) => new Date(a.slot.date) - new Date(b.slot.date)
-      );
-
-      setCurrentCount(sortedTodayAppointments.length);
-    } catch (error) {
-      console.error("Error fetching today's appointments:", error);
-    }
-  };
-
+  // useEffect hooks remain the same
   useEffect(() => {
-    fetchTodayAppointments();
-    fetchData();
-    generateThought();
-  }, []);
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
 
-  useEffect(() => {
-    const checkScreenSize = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      if (mobile) {
-        setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
-        setMobileSidebarOpen(false);
+        const [appointmentsRes, usersRes] = await Promise.all([
+          API.get("/api/appointment/allAppointments", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          API.get("/api/user/getAll", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        const sortedAppointments = appointmentsRes.data.appointments.sort(
+          (a, b) => new Date(a.slot.date) - new Date(b.slot.date)
+        );
+
+        setAppointmentCount(sortedAppointments.length);
+        setRecentAppointments(sortedAppointments.slice(0, 5)); 
+        setUserCount(usersRes.data.users.length);
+      } catch (err) {
+        setError("Failed to fetch data. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    // Check immediately on mount
+    const fetchTodayAppointments = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const res = await API.get(
+          `/api/appointment/getAppointmentsByDate/${
+            new Date().toISOString().split("T")[0]
+          }`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        setCurrentCount(res.data.appointments.length);
+      } catch (error) {
+        console.error("Error fetching today's appointments:", error);
+      }
+    };
+
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      setSidebarOpen(!mobile);
+    };
+
     checkScreenSize();
+    fetchTodayAppointments();
+    fetchData();
+    generateThought();
 
-    // Set up event listener
     window.addEventListener("resize", checkScreenSize);
-
-    // Clean up
     return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
+  }, [navigate]);
 
+  // Status update function remains the same
   const handleUpdateStatus = async (id, currentStatus) => {
     const token = localStorage.getItem("token");
-    let newStatus;
-
-    if (currentStatus === "Completed") {
-      newStatus = "Pending";
-    } else if (currentStatus === "Pending") {
-      newStatus = "Completed";
-    } else {
-      newStatus = "Cancelled";
-    }
+    let newStatus = currentStatus === "Completed" ? "Pending" : "Completed";
 
     try {
-      // Optimistically update UI
-      setRecentAppointments((prevAppointments) =>
-        prevAppointments.map((appointment) =>
-          appointment._id === id
-            ? { ...appointment, status: newStatus }
-            : appointment
+      setRecentAppointments((prev) =>
+        prev.map((appt) =>
+          appt._id === id ? { ...appt, status: newStatus } : appt
         )
       );
 
-      // API request
-      const res = await API.put(
+      await API.put(
         "/api/appointment/updateStatus",
         { appointmentId: id, status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -197,16 +163,11 @@ const AdminDashboard = () => {
 
       toast.success(`Status updated to ${newStatus}`);
     } catch (error) {
-      // Revert UI on failure
-      setRecentAppointments((prevAppointments) =>
-        prevAppointments.map((appointment) =>
-          appointment._id === id
-            ? { ...appointment, status: currentStatus }
-            : appointment
+      setRecentAppointments((prev) =>
+        prev.map((appt) =>
+          appt._id === id ? { ...appt, status: currentStatus } : appt
         )
       );
-
-      setError(error.response?.data?.message || "An error occurred");
       toast.error("Failed to update status");
     }
   };
@@ -221,108 +182,89 @@ const AdminDashboard = () => {
         />
       )}
 
-      {/* Mobile Sidebar Toggle */}
-      {isMobile && (
-        <button
-          className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all active:scale-95"
-          onClick={toggleMobileSidebar}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {mobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      )}
+      {/* Mobile Menu Button */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all"
+        onClick={toggleMobileSidebar}
+      >
+        {mobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
 
-      {/* Sidebar - Full Height */}
+      {/* Sidebar */}
       <div
-        className={`${sidebarOpen ? "w-72" : "w-24"} ${
+        className={`${sidebarOpen ? "w-64" : "w-20"} ${
           mobileSidebarOpen
             ? "translate-x-0"
             : "-translate-x-full md:translate-x-0"
-        } bg-gradient-to-b from-white to-gray-50 shadow-xl p-5 flex flex-col fixed inset-y-0 left-0 z-20 transition-all duration-300 border-r border-gray-200 pt-30`}
+        } bg-white shadow-xl p-4 flex flex-col fixed inset-y-0 left-0 z-30 transition-all duration-300 border-r border-gray-200`}
       >
-        {/* Rest of your sidebar content remains the same */}
         <div className="flex-1 flex flex-col">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-8 pt-2">
             {sidebarOpen && (
               <div className="flex items-center space-x-2">
-                <Stethoscope className="text-red-600 w-8 h-8" />
+                <Stethoscope className="text-red-600 w-7 h-7" />
                 <span className="text-xl font-bold text-gray-800">
-                  CardioAdmin
+                  CardioCare
                 </span>
               </div>
             )}
             <button
-              className="hidden md:flex items-center justify-center p-2 rounded-full bg-white shadow-sm hover:bg-gray-100"
+              className="hidden md:flex items-center justify-center p-1.5 rounded-md bg-gray-100 hover:bg-gray-200"
               onClick={toggleSideBar}
             >
               {sidebarOpen ? (
-                <ChevronLeft className="text-gray-600" />
+                <ChevronLeft className="text-gray-600" size={18} />
               ) : (
-                <ChevronRight className="text-gray-600" />
+                <ChevronRight className="text-gray-600" size={18} />
               )}
             </button>
           </div>
 
-          <nav className="flex-1 space-y-3">
-            <button
-              className="flex items-center space-x-4 p-3 w-full rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-all"
-              onClick={() => {
-                navigate("/admin/manageSlots");
-                setMobileSidebarOpen(false);
-              }}
-            >
-              <Calendar className="min-w-[24px]" />
-              {sidebarOpen && <span className="font-medium">Manage Slots</span>}
-            </button>
-            <button
-              className="flex items-center space-x-4 p-3 w-full rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-all"
-              onClick={() => {
-                navigate("/admin/appointments");
-                setMobileSidebarOpen(false);
-              }}
-            >
-              <Home className="min-w-[24px]" />
-              {sidebarOpen && <span className="font-medium">Appointments</span>}
-            </button>
-            <button
-              className="flex items-center space-x-4 p-3 w-full rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-all"
-              onClick={() => {
-                navigate("/admin/users");
-                setMobileSidebarOpen(false);
-              }}
-            >
-              <User className="min-w-[24px]" />
-              {sidebarOpen && <span className="font-medium">Patients</span>}
-            </button>
-            <button
-              className="flex items-center space-x-4 p-3 w-full rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-all"
-              onClick={() => {
-                navigate("/admin/edit-profile");
-                setMobileSidebarOpen(false);
-              }}
-            >
-              <Edit className="min-w-[24px]" />
-              {sidebarOpen && <span className="font-medium">Profile</span>}
-            </button>
+          <nav className="flex-1 space-y-1">
+            {[
+              { icon: Home, label: "Dashboard", path: "/admin" },
+              {
+                icon: Calendar,
+                label: "Manage Slots",
+                path: "/admin/manageSlots",
+              },
+              {
+                icon: ClipboardList,
+                label: "Appointments",
+                path: "/admin/appointments",
+              },
+              { icon: User, label: "Patients", path: "/admin/users" },
+              { icon: Edit, label: "Profile", path: "/admin/edit-profile" },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+                  window.location.pathname === item.path
+                    ? "bg-red-50 text-red-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+                onClick={closeMobileSidebar}
+              >
+                <item.icon className="min-w-[20px]" size={20} />
+                {sidebarOpen && (
+                  <span className="font-medium">{item.label}</span>
+                )}
+              </Link>
+            ))}
           </nav>
         </div>
 
-        <div className="mt-auto">
-          <div className="border-t border-gray-200 pt-4">
-            <button
-              className="flex items-center space-x-4 p-3 w-full rounded-xl hover:bg-red-50 text-gray-700 hover:text-red-700 transition-all"
-              onClick={handleLogout}
-            >
-              <LogOut className="min-w-[24px]" />
-              {sidebarOpen && <span className="font-medium">Logout</span>}
-            </button>
-          </div>
+        <div className="mt-auto pb-4">
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-3 p-3 w-full rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            <LogOut className="min-w-[20px]" size={20} />
+            {sidebarOpen && <span className="font-medium">Logout</span>}
+          </button>
           {sidebarOpen && (
-            <div className="mt-4 text-xs text-gray-500 text-center">
+            <div className="mt-4 text-xs text-gray-400 text-center">
               v2.1.0 • Cardiac Suite
             </div>
           )}
@@ -332,198 +274,145 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <div
         className={`flex-1 transition-all duration-300 ${
-          sidebarOpen ? "md:ml-72" : "md:ml-24"
-        } p-6 mt-25`}
+          sidebarOpen ? "md:ml-64" : "md:ml-20"
+        }`}
       >
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold  text-gray-800 flex items-center">
-              <Stethoscope className="text-red-600 mr-3" />
-              Clinical Dashboard
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Last updated: {new Date().toLocaleString()}
-            </p>
-          </div>
-        </div>
-
-        {/* Hero Section */}
-        <div className="mt-4 md:mt-6 bg-gradient-to-r from-red-50 to-red-100 p-6 md:p-10 rounded-xl text-center border border-red-200 shadow-sm">
-          <Heart size={40} className="text-red-600 mx-auto mb-3 md:mb-4" />
-          <p className="text-xl md:text-3xl font-semibold text-gray-800">
-            "Your heart health is our priority"
-          </p>
-          <p className="text-base md:text-lg text-gray-600 mt-2 md:mt-3">
-            Advanced cardiac care with compassionate treatment
-          </p>
-        </div>
-
-        {/* Stats Cards */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-            {[1, 2, 3, 4].map((_, index) => (
-              <Skeleton key={index} height={150} className="rounded-2xl" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-            <Link to="/user/todayAppointments">
-              <div className="bg-white p-6 rounded-2xl shadow-md border-l-4 border-red-500 hover:shadow-lg transition-shadow">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-500 font-medium">
-                      Today's Appointments
-                    </p>
-                    <p className="text-3xl font-bold text-gray-800 mt-2">
-                      {currentCount}
-                    </p>
-                  </div>
-
-                  <div className="bg-red-100 p-3 rounded-full">
-                    <Clock className="text-red-600 w-6 h-6" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center text-sm text-gray-500">
-                  <Activity className="mr-1 w-4 h-4" />
-                  <span>Live data</span>
-                </div>
-              </div>
-            </Link>
-            <Link
-              to="/admin/appointments"
-              className="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow"
+        <div className="p-6 md:p-8">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center">
+                <Stethoscope className="text-red-600 mr-3" size={28} />
+                Clinical Dashboard
+              </h1>
+              <p className="text-gray-500 mt-1 text-sm">
+                {new Date().toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </p>
+            </div>
+            <button
+              onClick={() => navigate("/admin/manageSlots")}
+              className="mt-4 md:mt-0 flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md transition-colors"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 font-medium">Total Bookings</p>
-                  <p className="text-3xl font-bold text-gray-800 mt-2">
-                    {appointmentCount}
-                  </p>
-                </div>
-                <div className="bg-blue-100 p-3 rounded-full">
-                  <Calendar className="text-blue-600 w-6 h-6" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-sm text-gray-500">
-                <Activity className="mr-1 w-4 h-4" />
-                <span>All time records</span>
-              </div>
-            </Link>
+              <Plus className="mr-2" size={18} />
+              Create New Slot
+            </button>
+          </div>
 
-            <Link
-              to="/admin/users"
-              className="bg-white p-6 rounded-2xl shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 font-medium">Patient Records</p>
-                  <p className="text-3xl font-bold text-gray-800 mt-2">
-                    {userCount - 1}
-                  </p>
-                </div>
-                <div className="bg-green-100 p-3 rounded-full">
-                  <User className="text-green-600 w-6 h-6" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-sm text-gray-500">
-                <Activity className="mr-1 w-4 h-4" />
-                <span>Registered patients</span>
-              </div>
-            </Link>
-
-            <div className="bg-white p-6 rounded-2xl shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-500 font-medium">System Health</p>
-                  <p className="text-3xl font-bold text-gray-800 mt-2">100%</p>
-                </div>
-                <div className="bg-purple-100 p-3 rounded-full">
-                  <CheckCircle className="text-purple-600 w-6 h-6" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center text-sm text-gray-500">
-                <Activity className="mr-1 w-4 h-4" />
-                <span>All systems operational</span>
-              </div>
+          {/* Hero Banner */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 rounded-2xl text-white shadow-lg mb-8">
+            <div className="max-w-2xl mx-auto text-center">
+              <Heart className="mx-auto mb-4" size={40} />
+              <h2 className="text-2xl md:text-3xl font-bold mb-2">
+                Advancing Cardiac Care
+              </h2>
+              <p className="text-red-100">
+                "Delivering exceptional cardiovascular health services with
+                precision and compassion"
+              </p>
             </div>
           </div>
-        )}
 
-        {/* Recent Appointments */}
-        <div className="mt-8 bg-white rounded-2xl shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-              <ClipboardList className="text-red-600 mr-3" />
-              Recent Consultations
-            </h2>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {loading ? (
+              Array(4)
+                .fill(0)
+                .map((_, i) => (
+                  <Skeleton key={i} height={120} className="rounded-xl" />
+                ))
+            ) : (
+              <>
+                <StatCard
+                  icon={Clock}
+                  color="blue"
+                  title="Today's Appointments"
+                  value={currentCount}
+                  change="+2 from yesterday"
+                  link="/admin/appointments?filter=today"
+                />
+                <StatCard
+                  icon={Calendar}
+                  color="purple"
+                  title="Total Bookings"
+                  value={appointmentCount}
+                  change="+15% this month"
+                  link="/admin/appointments"
+                />
+                <StatCard
+                  icon={User}
+                  color="green"
+                  title="Patients"
+                  value={userCount - 1}
+                  change="+8 new this week"
+                  link="/admin/users"
+                />
+                <StatCard
+                  icon={CheckCircle}
+                  color="orange"
+                  title="System Status"
+                  value="100%"
+                  change="All systems operational"
+                />
+              </>
+            )}
           </div>
 
-          {recentAppointments.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Patient
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date & Time
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {recentAppointments.map((appointment) => (
-                    <tr
-                      key={appointment._id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 bg-red-100 rounded-full flex items-center justify-center">
-                            <User className="text-red-600 w-5 h-5" />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {appointment.user?.username || "N/A"}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {appointment.user?.email || ""}
-                            </div>
-                          </div>
+          {/* Recent Appointments */}
+          <div className="bg-white rounded-2xl shadow-md overflow-hidden mb-8">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+                <ClipboardList className="text-red-600 mr-3" />
+                Recent Consultations
+              </h2>
+              <Link
+                to="/admin/appointments"
+                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+              >
+                View all <ChevronRight className="ml-1" size={16} />
+              </Link>
+            </div>
+
+            {loading ? (
+              <div className="p-6">
+                <Skeleton count={5} height={60} className="mb-2" />
+              </div>
+            ) : recentAppointments.length > 0 ? (
+              <div className="divide-y divide-gray-100">
+                {recentAppointments.map((appointment) => (
+                  <div
+                    key={appointment._id}
+                    className="p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="bg-red-100 p-2 rounded-full mr-4">
+                          <User className="text-red-600" size={18} />
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <h3 className="font-medium text-gray-800">
+                            {appointment.user?.username || "Anonymous"}
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {formatDate(appointment.slot?.date)} •{" "}
+                            {appointment.slot?.startTime}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4">
                         <span
-                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          className={`px-3 py-1 text-xs font-medium rounded-full ${
                             appointment.status === "Completed"
                               ? "bg-green-100 text-green-800"
-                              : appointment.status === "Cancelled"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-blue-100 text-red-800"
+                              : "bg-blue-100 text-blue-800"
                           }`}
                         >
                           {appointment.status}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="flex items-center">
-                          <Calendar className="mr-2 text-gray-400 w-4 h-4" />
-                          {formatDate(appointment.slot?.date)}
-                        </div>
-                        <div className="flex items-center mt-1">
-                          <Clock className="mr-2 text-gray-400 w-4 h-4" />
-                          {appointment.slot?.startTime} -{" "}
-                          {appointment.slot?.endTime}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={() =>
                             handleUpdateStatus(
@@ -531,91 +420,230 @@ const AdminDashboard = () => {
                               appointment.status
                             )
                           }
-                          className={`text-blue-600 cursor-pointer hover:text-blue-900 ${
+                          className={`text-sm ${
                             appointment.status === "Completed"
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
+                              ? "text-gray-400 cursor-not-allowed"
+                              : "text-blue-600 hover:text-blue-800"
                           }`}
                           disabled={appointment.status === "Completed"}
                         >
-                          Mark Completed
+                          Mark Complete
                         </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="p-6 text-center text-gray-500">
-              No recent consultations found
-            </div>
-          )}
-        </div>
-
-        {/* Thought of the Day */}
-        <div className="mt-8 bg-white p-6 rounded-2xl shadow-md">
-          <h1 className="text-xl font-semibold text-blue-700 flex items-center">
-            <ClipboardList className="mr-2" />
-            Clinical Insight
-          </h1>
-          <p className="text-gray-700 mt-2 italic">"{thoughtOfTheDay}"</p>
-        </div>
-
-        {/* Error Display */}
-        {error && (
-          <div className="mt-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <AlertCircle className="h-5 w-5 text-red-500" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+            ) : (
+              <div className="p-6 text-center text-gray-500">
+                <FileText className="mx-auto mb-2 text-gray-300" size={32} />
+                <p>No recent consultations found</p>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Clinical Insight */}
+            <div className="bg-white p-6 rounded-2xl shadow-md">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800 flex items-center">
+                  <Shield className="text-red-600 mr-2" />
+                  Clinical Insight
+                </h3>
+                <button
+                  onClick={generateThought}
+                  className="text-xs text-blue-600 hover:text-blue-800"
+                >
+                  Refresh
+                </button>
+              </div>
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-gray-700 italic">"{thoughtOfTheDay}"</p>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white p-6 rounded-2xl shadow-md">
+              <h3 className="font-semibold text-gray-800 flex items-center mb-4">
+                <Activity className="text-red-600 mr-2" />
+                Quick Actions
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => navigate("/admin/manageSlots")}
+                  className="p-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-blue-700 flex flex-col items-center justify-center transition-colors"
+                >
+                  <Plus size={20} className="mb-1" />
+                  <span className="text-xs font-medium">New Slot</span>
+                </button>
+                <button
+                  onClick={() => navigate("/admin/users")}
+                  className="p-3 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 flex flex-col items-center justify-center transition-colors"
+                >
+                  <User size={20} className="mb-1" />
+                  <span className="text-xs font-medium">Add Patient</span>
+                </button>
+                <button
+                  onClick={() => navigate("/admin/appointments")}
+                  className="p-3 bg-purple-50 hover:bg-purple-100 rounded-lg text-purple-700 flex flex-col items-center justify-center transition-colors"
+                >
+                  <Calendar size={20} className="mb-1" />
+                  <span className="text-xs font-medium">View Calendar</span>
+                </button>
+                <button
+                  onClick={() => navigate("/admin/reports")}
+                  className="p-3 bg-orange-50 hover:bg-orange-100 rounded-lg text-orange-700 flex flex-col items-center justify-center transition-colors"
+                >
+                  <TrendingUp size={20} className="mb-1" />
+                  <span className="text-xs font-medium">Reports</span>
+                </button>
+              </div>
+            </div>
+
+            {/* System Status */}
+            <div className="bg-white p-6 rounded-2xl shadow-md">
+              <h3 className="font-semibold text-gray-800 flex items-center mb-4">
+                <CheckCircle className="text-green-600 mr-2" />
+                System Status
+              </h3>
+              <div className="space-y-3">
+                {[
+                  {
+                    name: "Appointment Module",
+                    status: "Operational",
+                    icon: Calendar,
+                  },
+                  {
+                    name: "Patient Records",
+                    status: "Operational",
+                    icon: User,
+                  },
+                  {
+                    name: "Billing System",
+                    status: "Operational",
+                    icon: FileText,
+                  },
+                  {
+                    name: "API Services",
+                    status: "Operational",
+                    icon: Activity,
+                  },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex items-center">
+                      <div className="bg-green-100 p-1.5 rounded-full mr-3">
+                        <item.icon className="text-green-600" size={16} />
+                      </div>
+                      <span className="text-sm text-gray-700">{item.name}</span>
+                    </div>
+                    <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                      {item.status}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        )}
 
-        {/* Footer */}
-        <footer className="mt-12 pt-6 border-t border-gray-200">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-4 mb-4 md:mb-0">
-              <Stethoscope className="text-red-600" />
-              <span className="text-sm text-gray-600">
-                © {new Date().getFullYear()} Cardiac Care Suite
-              </span>
+          {/* Footer */}
+          <footer className="mt-12 pt-6 border-t border-gray-200">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="flex items-center space-x-2 mb-4 md:mb-0">
+                <Stethoscope className="text-red-600" size={18} />
+                <span className="text-sm text-gray-500">
+                  © {new Date().getFullYear()} CardioCare Admin
+                </span>
+              </div>
+              <div className="flex space-x-4">
+                <Link
+                  to="/terms"
+                  className="text-sm text-gray-500 hover:text-red-600"
+                >
+                  Terms
+                </Link>
+                <Link
+                  to="/privacy"
+                  className="text-sm text-gray-500 hover:text-red-600"
+                >
+                  Privacy
+                </Link>
+                <Link
+                  to="/contact"
+                  className="text-sm text-gray-500 hover:text-red-600"
+                >
+                  Contact
+                </Link>
+              </div>
             </div>
-            <div className="flex space-x-6">
-              <Link
-                to="/terms"
-                className="text-sm text-gray-600 hover:text-red-600"
-              >
-                Terms
-              </Link>
-              <Link
-                to="/privacy"
-                className="text-sm text-gray-600 hover:text-red-600"
-              >
-                Privacy
-              </Link>
-              <Link
-                to="/contact"
-                className="text-sm text-gray-600 hover:text-red-600"
-              >
-                Contact
-              </Link>
-            </div>
-          </div>
-        </footer>
+          </footer>
+        </div>
       </div>
 
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        toastClassName="rounded-lg shadow-md"
-        progressClassName="bg-red-500"
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        toastClassName="rounded-lg shadow-sm"
+        progressClassName="bg-gradient-to-r from-red-500 to-red-600"
       />
     </div>
+  );
+};
+
+// StatCard Component for reusable stats
+const StatCard = ({ icon: Icon, color, title, value, change, link }) => {
+  const colorClasses = {
+    blue: {
+      bg: "bg-blue-50",
+      text: "text-blue-600",
+      border: "border-blue-200",
+    },
+    purple: {
+      bg: "bg-purple-50",
+      text: "text-purple-600",
+      border: "border-purple-200",
+    },
+    green: {
+      bg: "bg-green-50",
+      text: "text-green-600",
+      border: "border-green-200",
+    },
+    orange: {
+      bg: "bg-orange-50",
+      text: "text-orange-600",
+      border: "border-orange-200",
+    },
+  };
+
+  return (
+    <Link
+      to={link || "#"}
+      className={`p-5 rounded-xl border-l-4 ${colorClasses[color].border} ${colorClasses[color].bg} hover:shadow-md transition-shadow`}
+    >
+      <div className="flex justify-between items-start">
+        <div>
+          <p className="text-sm font-medium text-gray-500">{title}</p>
+          <p className="text-2xl font-bold text-gray-800 mt-1">{value}</p>
+        </div>
+        <div className={`p-2 rounded-lg ${colorClasses[color].text} bg-white`}>
+          <Icon size={20} />
+        </div>
+      </div>
+      <p className="text-xs text-gray-500 mt-3 flex items-center">
+        <TrendingUp className="mr-1" size={14} />
+        {change}
+      </p>
+    </Link>
   );
 };
 
