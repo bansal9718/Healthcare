@@ -38,8 +38,8 @@ const UserDashboard = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   const navigate = useNavigate();
-  // const API_BASE_URL = "https://healthcare-9uj8.onrender.com";
-  const API_BASE_URL = "http://localhost:8001";
+  const API_BASE_URL = "https://healthcare-9uj8.onrender.com";
+  // const API_BASE_URL = "http://localhost:8001";
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);

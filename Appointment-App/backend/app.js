@@ -16,8 +16,8 @@ const paymentRoutes = require("./Routes/PaymentRoutes");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// const allowedOrigins = ["https://advancedcardiaccare.netlify.app"];
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = ["https://advancedcardiaccare.netlify.app"];
+// const allowedOrigins = ["http://localhost:5173"];
 
 app.use(
   cors({
@@ -31,7 +31,6 @@ app.use(
     credentials: true,
   })
 );
-
 
 // Mounting the routes
 app.use("/api/user", UserRoutes);
